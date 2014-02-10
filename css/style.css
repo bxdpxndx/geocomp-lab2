@@ -1,0 +1,41 @@
+body {
+  font-family: 'Droid Sans', 'Lucida Sans', sans-serif !important;
+} 
+
+/* remember to style a elements! */
+.outer-container {
+  margin: 30px 60px;
+}
+
+.inner-container {
+  margin: 0 auto;
+  max-width:1050px;
+}
+
+.canvas-container {
+  float:left;
+  border: 1px solid  #33b5e5;
+}
+
+.clear {
+  clear: both;
+}
+
+#delaunay {
+  margin: 0 auto;
+}
+
+.btn {
+  display:block;
+  float:left;
+  background: #33b5e5;
+  color: white;
+  padding: 12px;
+  width: 150px;
+  margin:0 1px 1px 0;
+  border:none;
+}
+
+.btn:focus {
+  outline:none;
+}
