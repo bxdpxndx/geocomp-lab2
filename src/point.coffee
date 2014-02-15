@@ -12,14 +12,10 @@ class Point
     return new Point(@x - other.x, @y - other.y)
 
   dot: (other) -> 
-    return new Point(@x * other.x, @y * other.y)
-
-  mult: (other) -> 
-    return new Point(@x * other, @y * other)
+    return @x * other.x + @y * other.y
 
   norm: ->
     return Math.sqrt(@x*@x + @y*@y) 
-
 
   draw: (ctx) ->
     sz = 2

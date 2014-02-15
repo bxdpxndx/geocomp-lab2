@@ -1,7 +1,7 @@
 window.onload = ->
   
   # Can't touch this
-  fps = 30
+  fps = 10
   canvas = document.getElementById('delaunay')
   ctx = canvas.getContext('2d')
   mouse = new Point(0,0)
@@ -23,7 +23,7 @@ window.onload = ->
     b = document.createElement("input")
     b.type      = "submit"
     b.className = "btn"
-    b.value     = text
+    b.value     = text + ' (' + key + ')'
     b.id        = key
     b.onclick   = action
     keymap[key] = action
@@ -31,44 +31,42 @@ window.onload = ->
 
   # end of private part
   # set global variables here (processing 'setup')
-  points    = []
   
-  supertriangle = new Triangle(new Point(420,-1000),
-                               new Point(-1000, 2000),
-                               new Point(1840, 2001))
+  supertriangle = new Triangle(new Point(canvas.width/2,-1000),
+                               new Point(-1000, canvas.height + 1000),
+                               new Point(canvas.width+1000, canvas.height + 1000))
   triangles = [supertriangle]
-  circles   = []
+  points    = []
   show_circles = false
 
   # edit this, it should be pretty straightforward
   mainloop = ->
-    ctx.clearRect(0,0, canvas.width, canvas.height)
-    p.draw(ctx) for p in points
-    for i in [0..points.length-2] by 3
-      if points.length > i+2
-        t = new Triangle(points[i], points[i+1], points[i+2])
-      else
-        t = new Triangle(points[i], points[i+1], mouse)
-      t.draw(ctx)
-      t.getCircle().draw(ctx) if show_circles
 
+    ctx.clearRect(0,0, canvas.width, canvas.height)
+    ctx.fillText("Mouse:" + mouse.x + ', ' + mouse.y, 750, 470)
+    p.draw(ctx) for p in points
+    t.draw(ctx) for t in triangles
+    t.getCircle().draw(ctx) for t in triangles when show_circles
+    return
   # handlers and thingies that can't be initialized earlier.
   
   window.setInterval(mainloop, 1000/ fps)
   
   canvas.onclick = (e) ->
     points.push mouse
-    tri = [t for t in triangles when t.contains(mouse)]
-    tri = tri[0]
+    tri = t for t in triangles when t.contains(mouse)
+    console.log tri
+    t0 = new Triangle(tri.p0, tri.p1, mouse)
     triangles.push(new Triangle(tri.p0, tri.p1, mouse))
     triangles.push(new Triangle(tri.p1, tri.p2, mouse))
     triangles.push(new Triangle(tri.p2, tri.p0, mouse))
+    triangles.splice(triangles.indexOf(tri),1)
 
   canvas.onmousemove = (e) -> 
     mouse = new Point(e.offsetX, e.offsetY)
 
   # define new behaviours here.
-  newButton('r', 'Clear', -> points = [])
+  newButton('r', 'Clear', -> points = []; triangles = [supertriangle])
   newButton('q', 'Toggle Circles', -> show_circles = !show_circles)
 
 # REQUIREMENTS

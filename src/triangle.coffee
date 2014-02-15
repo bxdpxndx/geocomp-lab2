@@ -6,6 +6,11 @@ class Triangle
     @p2 = p2
     @color = color
 
+    neighbour0 = this
+    neighbour1 = this
+    neighbour2 = this
+
+
   getCircle: ->
     center = new Point(0,0);
 
@@ -17,8 +22,6 @@ class Triangle
     #if xDelta_p0 is 0 
 
     #if xDelta_p1 is 0
-
-
     
     p0Slope  = yDelta_p0/xDelta_p0;
     p1Slope  = yDelta_p1/xDelta_p1;  
@@ -30,7 +33,21 @@ class Triangle
     return new Circle(center, r)
 
   contains: (point)  ->
-    @getCircle().contains(point)
+    v0 = @p2.sub @p0
+    v1 = @p1.sub @p0
+    v2 = point.sub @p0
+
+    dot00 = v0.dot(v0)
+    dot01 = v0.dot(v1)
+    dot02 = v0.dot(v2)
+    dot11 = v1.dot(v1)
+    dot12 = v1.dot(v2)
+
+    invDenom = 1 / (dot00 * dot11 - dot01 * dot01)
+    u = (dot11 * dot02 - dot01 * dot12) * invDenom
+    v = (dot00 * dot12 - dot01 * dot02) * invDenom
+
+    return (u >= 0) && (v >= 0) && (u + v < 1)
 
   draw: (ctx) ->
     ctx.beginPath()
