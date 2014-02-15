@@ -54,8 +54,8 @@ window.onload = ->
   
   canvas.onclick = (e) ->
     points.push mouse
-    tri = t for t in triangles when t.contains(mouse)
-    console.log tri
+    tri = (t for t in triangles when t.contains(mouse))
+    tri = tri[0]
     t0 = new Triangle(tri.p0, tri.p1, mouse)
     triangles.push(new Triangle(tri.p0, tri.p1, mouse))
     triangles.push(new Triangle(tri.p1, tri.p2, mouse))
