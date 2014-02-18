@@ -18,11 +18,12 @@ class Triangle
     #if xDelta_p0 is 0 
 
     #if xDelta_p1 is 0
-    
+
     p0Slope  = yDelta_p0/xDelta_p0
     p1Slope  = yDelta_p1/xDelta_p1  
     center.x = (p0Slope*p1Slope*(p0.y - p2.y) + p1Slope*(p0.x + p1.x) - p0Slope*(p1.x+p2.x) )/(2*(p1Slope-p0Slope) )
     center.y = -1*(center.x - (p0.x+p1.x)/2)/p0Slope + (p0.y+p1.y)/2
+
     r = center.sub p0
     r = r.norm()
 
