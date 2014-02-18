@@ -8,7 +8,8 @@ class Triangle
 
   getCircle: ->
     center = new Point(0,0);
-    [p1, p2, p3] = @vertexs
+    [p0, p1, p2] = @vertexs
+    console.log p0, p1, p2
     yDelta_p0 = p1.y - p0.y;
     xDelta_p0 = p1.x - p0.x;
     yDelta_p1 = p2.y - p1.y;

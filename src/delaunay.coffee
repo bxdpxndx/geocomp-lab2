@@ -1,8 +1,8 @@
 class Delaunay
   constructor: (canvas) ->
     @supertriangle = new Triangle(new Point(canvas.width/2,-1500),
-                                 new Point(-1000, canvas.height + 1000),
-                                 new Point(canvas.width+1000, canvas.height + 1000))
+                                  new Point(-1000, canvas.height + 1000),
+                                  new Point(canvas.width+1000, canvas.height + 1000))
     @triangles = [@supertriangle]
     @points = @supertriangle.vertexs.slice()
     @needs_checking = []
@@ -15,8 +15,9 @@ class Delaunay
     tri = tri[0]
     @retriangulate(tri, point)
     while @needs_checking.length
-      [t0, t1] = @needs_checking.pop()
-      flip_triangles(t0, t1)
+      t0 = @needs_checking.pop()
+      t1 = @needs_checking.pop()
+      @flip_triangles(t0, t1)
 
 
     console.log @triangles.length
@@ -36,11 +37,38 @@ class Delaunay
     
     @triangles.push x for x in [t0,t1,t2]
     @triangles.splice(@triangles.indexOf(tri),1)
+    @needs_checking.push x for x in [t0,t1,t2]
 
   flip_triangles: (t1, t2) ->
     # two triangles and 4 points. find the points unique to each triangle
     # check if any point is inside the other triangles' circle.
     # if so, then flip the triangles and do the triangle dance.
+    free_t1 = t for t in t1.vertexs when t not in t2.vertexs
+    free_t2 = t for t in t2.vertexs when t not in t1.vertexs
+    console.log t1
+    c1 = t1.getCircle()
+    #c2 = t2.getCircle()
+
+    if c1.contains(free_t2) or c2.contains(free_t1)
+      # Create the news triangles 
+      n_t1 = new Triangle(free_t1, free_t2, union[0])
+      n_t2 = new Triangle(free_t1, free_t2, union[1])
+
+      # get the nbs of the olds triangles 
+      nbs_t1 = t for t in t1.nbs when t is not t2
+      nbs_t2 = t for t in t2.nbs when t is not t1
+      all_t = [nbs_t1, nbs_t2]
+
+      for t in all_t
+        union_t1 = v for v in n_t1.vertexs when v in t.vertexs   
+        #if union_t1.length > 1 then n_t1.nbs.push t else n_t2.nbs. push t 
+        if union_t1.length > 1 
+          n_t1.nbs.push t 
+          for n in @triangles when n is t
+            n = t
+          # for t.nbs in n is t1  
+        else 
+          n_t2.nbs.push t 
 
   draw: (ctx) ->
     p.draw(ctx) for p in @points
