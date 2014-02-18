@@ -114,9 +114,9 @@
   Delaunay = (function() {
 
     function Delaunay(canvas) {
-      this.points = [];
       this.supertriangle = new Triangle(new Point(canvas.width / 2, -1500), new Point(-1000, canvas.height + 1000), new Point(canvas.width + 1000, canvas.height + 1000));
       this.triangles = [this.supertriangle];
+      this.points = this.supertriangle.vertexs.slice();
       this.needs_checking = [];
       this.show_circles = false;
     }
@@ -138,8 +138,8 @@
       }).call(this);
       tri = tri[0];
       this.retriangulate(tri, point);
-      while (needs_checking) {
-        _ref = needs_checking.pop(), t0 = _ref[0], t1 = _ref[1];
+      while (this.needs_checking.length) {
+        _ref = this.needs_checking.pop(), t0 = _ref[0], t1 = _ref[1];
         flip_triangles(t0, t1);
       }
       return console.log(this.triangles.length);
@@ -148,24 +148,12 @@
     Delaunay.prototype.retriangulate = function(tri, point) {
       var p0, p1, p2, t0, t1, t2, x, _i, _len, _ref, _ref1;
       _ref = tri.vertexs, p0 = _ref[0], p1 = _ref[1], p2 = _ref[2];
-      t0 = new Triangle(tri.p0, tri.p1, point);
-      t1 = new Triangle(point, tri.p1, tri.p2);
-      t2 = new Triangle(tri.p0, point, tri.p2);
-      t0.n0 = tri.nbs[0];
-      t0.n1 = t1;
-      t0.n2 = t2;
-      t1.n0 = t0;
-      t1.n1 = tri.nbs[1];
-      t1.n2 = t2;
-      t2.n0 = t0;
-      t2.n1 = t1;
-      t2.n2 = tri.nbs[2];
-      tri.nbs[0].splice(tri.nbs[0].nbs.indexOf(tri), 1);
-      tri.nbs[0].push(t0);
-      tri.nbs[1].splice(tri.nbs[1].nbs.indexOf(tri), 1);
-      tri.nbs[1].push(t1);
-      tri.nbs[2].splice(tri.nbs[2].nbs.indexOf(tri), 1);
-      tri.nbs[2].push(t2);
+      t0 = new Triangle(p0, p1, point);
+      t1 = new Triangle(point, p1, p2);
+      t2 = new Triangle(p0, point, p2);
+      t0.nbs = [tri.nbs[0], t1, t2];
+      t1.nbs = [t0, tri.nbs[1], t2];
+      t2.nbs = [t0, t1, tri.nbs[2]];
       _ref1 = [t0, t1, t2];
       for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
         x = _ref1[_i];

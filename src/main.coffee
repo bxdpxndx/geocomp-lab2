@@ -31,43 +31,29 @@ window.onload = ->
 
   # end of private part
   # set global variables here (processing 'setup')
-  
-  supertriangle = new Triangle(new Point(canvas.width/2,-1000),
-                               new Point(-1000, canvas.height + 1000),
-                               new Point(canvas.width+1000, canvas.height + 1000))
-  triangles = [supertriangle]
-  points    = []
-  show_circles = false
+
+  delaunay = new Delaunay(canvas)
 
   # edit this, it should be pretty straightforward
   mainloop = ->
 
     ctx.clearRect(0,0, canvas.width, canvas.height)
     ctx.fillText("Mouse:" + mouse.x + ', ' + mouse.y, 750, 470)
-    p.draw(ctx) for p in points
-    t.draw(ctx) for t in triangles
-    t.getCircle().draw(ctx) for t in triangles when show_circles
-    return
+    delaunay.draw(ctx)
   # handlers and thingies that can't be initialized earlier.
+
   
   window.setInterval(mainloop, 1000/ fps)
   
   canvas.onclick = (e) ->
-    points.push mouse
-    tri = (t for t in triangles when t.contains(mouse))
-    tri = tri[0]
-    t0 = new Triangle(tri.p0, tri.p1, mouse)
-    triangles.push(new Triangle(tri.p0, tri.p1, mouse))
-    triangles.push(new Triangle(tri.p1, tri.p2, mouse))
-    triangles.push(new Triangle(tri.p2, tri.p0, mouse))
-    triangles.splice(triangles.indexOf(tri),1)
+    delaunay.new_point(new Point(e.offsetX, e.offsetY))
 
   canvas.onmousemove = (e) -> 
     mouse = new Point(e.offsetX, e.offsetY)
 
   # define new behaviours here.
-  newButton('r', 'Clear', -> points = []; triangles = [supertriangle])
-  newButton('q', 'Toggle Circles', -> show_circles = !show_circles)
+  newButton('r', 'Clear', -> delaunay = new Delaunay(canvas))
+  newButton('q', 'Toggle Circles', -> delaunay.show_circles = !delaunay.show_circles)
 
 # REQUIREMENTS
 
