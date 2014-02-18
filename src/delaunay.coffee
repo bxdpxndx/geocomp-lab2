@@ -14,19 +14,12 @@ class Delaunay
     tri = (t for t in @triangles when t.contains(point))
     tri = tri[0]
     @retriangulate(tri, point)
-<<<<<<< HEAD
-    while @needs_checking.length > 1
-      t0 = @needs_checking.pop()
-      t1 = @needs_checking.slice(-1)
-      @flip_triangles(t0, t1[0])
-=======
     while @needs_checking.length
       [t0, t1] = @needs_checking.pop()
       if t0.nbs.some((x) -> x == null) or t1.nbs.some((x) -> x == null)
         continue
       else
         @flip_triangles(t0, t1)
->>>>>>> 67e850c4bc3e440447f74036f2ce5bd3b734dbac
 
     return
 
