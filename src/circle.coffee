@@ -10,8 +10,8 @@ class Circle
   #intersecs: (circle) ->
     # still missing!
 
-  draw: (ctx) ->
+  draw: (ctx, hl = false) ->
     ctx.beginPath()
     ctx.arc(@c.x,@c.y,@r,0,2*Math.PI)
-    ctx.strokeStyle = @color.asHex()
+    ctx.strokeStyle = @color.asHex() 
     ctx.stroke()

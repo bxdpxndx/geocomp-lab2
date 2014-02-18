@@ -35,15 +35,24 @@ class Delaunay
     # i'm not sure this is 100% correct... don't know how to test.
     
     @triangles.push x for x in [t0,t1,t2]
+
     @triangles.splice(@triangles.indexOf(tri),1)
 
   flip_triangles: (t1, t2) ->
+
     # two triangles and 4 points. find the points unique to each triangle
     # check if any point is inside the other triangles' circle.
     # if so, then flip the triangles and do the triangle dance.
 
   draw: (ctx) ->
     p.draw(ctx) for p in @points
-    t.draw(ctx) for t in @triangles
-    t.getCircle().draw(ctx) for t in @triangles when @show_circles
+    for t in @triangles
+      t.draw(ctx)
+      t.getCircle().draw(ctx) if @show_circles
+    for t0, t1 in @needs_checking
+      ctx.beginPath()
+      ctx.moveTo(t0.center().x, t0.center().y)
+      ctx.lineTo(t1.center().x, t1.center().y)
+      ctx.stroke()
+      return
     return

@@ -66,7 +66,10 @@
       return this.r * this.r > (this.c.x - point.x) * (this.c.x - point.x) + (this.c.y - point.y) * (this.c.y - point.y);
     };
 
-    Circle.prototype.draw = function(ctx) {
+    Circle.prototype.draw = function(ctx, hl) {
+      if (hl == null) {
+        hl = false;
+      }
       ctx.beginPath();
       ctx.arc(this.c.x, this.c.y, this.r, 0, 2 * Math.PI);
       ctx.strokeStyle = this.color.asHex();
@@ -165,7 +168,7 @@
     Delaunay.prototype.flip_triangles = function(t1, t2) {};
 
     Delaunay.prototype.draw = function(ctx) {
-      var p, t, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+      var p, t, t0, t1, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
       _ref = this.points;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
@@ -175,13 +178,18 @@
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         t = _ref1[_j];
         t.draw(ctx);
-      }
-      _ref2 = this.triangles;
-      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-        t = _ref2[_k];
         if (this.show_circles) {
           t.getCircle().draw(ctx);
         }
+      }
+      _ref2 = this.needs_checking;
+      for (t1 = _k = 0, _len2 = _ref2.length; _k < _len2; t1 = ++_k) {
+        t0 = _ref2[t1];
+        ctx.beginPath();
+        ctx.moveTo(t0.center().x, t0.center().y);
+        ctx.lineTo(t1.center().x, t1.center().y);
+        ctx.stroke();
+        return;
       }
     };
 
@@ -244,9 +252,9 @@
     }
 
     Triangle.prototype.getCircle = function() {
-      var center, p0Slope, p1, p1Slope, p2, p3, r, xDelta_p0, xDelta_p1, yDelta_p0, yDelta_p1, _ref;
+      var center, p0, p0Slope, p1, p1Slope, p2, r, xDelta_p0, xDelta_p1, yDelta_p0, yDelta_p1, _ref;
       center = new Point(0, 0);
-      _ref = this.vertexs, p1 = _ref[0], p2 = _ref[1], p3 = _ref[2];
+      _ref = this.vertexs, p0 = _ref[0], p1 = _ref[1], p2 = _ref[2];
       yDelta_p0 = p1.y - p0.y;
       xDelta_p0 = p1.x - p0.x;
       yDelta_p1 = p2.y - p1.y;
@@ -255,9 +263,32 @@
       p1Slope = yDelta_p1 / xDelta_p1;
       center.x = (p0Slope * p1Slope * (p0.y - p2.y) + p1Slope * (p0.x + p1.x) - p0Slope * (p1.x + p2.x)) / (2 * (p1Slope - p0Slope));
       center.y = -1 * (center.x - (p0.x + p1.x) / 2) / p0Slope + (p0.y + p1.y) / 2;
-      r = center.sub(this.p0);
+      r = center.sub(p0);
       r = r.norm();
       return new Circle(center, r);
+    };
+
+    Triangle.prototype.center = function() {
+      var v;
+      return new Point(sum((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.vertexs;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          v = _ref[_i];
+          _results.push(v.x);
+        }
+        return _results;
+      }).call(this)) / 3, sum((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.vertexs;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          v = _ref[_i];
+          _results.push(v.y);
+        }
+        return _results;
+      }).call(this)) / 3);
     };
 
     Triangle.prototype.contains = function(point) {
@@ -277,8 +308,11 @@
       return (u >= 0) && (v >= 0) && (u + v < 1);
     };
 
-    Triangle.prototype.draw = function(ctx) {
+    Triangle.prototype.draw = function(ctx, hl) {
       var p0, p1, p2, _ref;
+      if (hl == null) {
+        hl = false;
+      }
       _ref = this.vertexs, p0 = _ref[0], p1 = _ref[1], p2 = _ref[2];
       ctx.beginPath();
       ctx.moveTo(p0.x, p0.y);

@@ -4,28 +4,32 @@ class Triangle
     @vertexs = [p0, p1, p2]
     @nbs = [null,null,null]
     @color = color
+    
 
 
   getCircle: ->
-    center = new Point(0,0);
-    [p1, p2, p3] = @vertexs
-    yDelta_p0 = p1.y - p0.y;
-    xDelta_p0 = p1.x - p0.x;
-    yDelta_p1 = p2.y - p1.y;
-    xDelta_p1 = p2.x - p1.x;
+    center = new Point(0,0)
+    [p0, p1, p2] = @vertexs
+    yDelta_p0 = p1.y - p0.y
+    xDelta_p0 = p1.x - p0.x
+    yDelta_p1 = p2.y - p1.y
+    xDelta_p1 = p2.x - p1.x
 
     #if xDelta_p0 is 0 
 
     #if xDelta_p1 is 0
     
-    p0Slope  = yDelta_p0/xDelta_p0;
-    p1Slope  = yDelta_p1/xDelta_p1;  
-    center.x = (p0Slope*p1Slope*(p0.y - p2.y) + p1Slope*(p0.x + p1.x) - p0Slope*(p1.x+p2.x) )/(2*(p1Slope-p0Slope) );
-    center.y = -1*(center.x - (p0.x+p1.x)/2)/p0Slope + (p0.y+p1.y)/2;
-    r = center.sub @p0
+    p0Slope  = yDelta_p0/xDelta_p0
+    p1Slope  = yDelta_p1/xDelta_p1  
+    center.x = (p0Slope*p1Slope*(p0.y - p2.y) + p1Slope*(p0.x + p1.x) - p0Slope*(p1.x+p2.x) )/(2*(p1Slope-p0Slope) )
+    center.y = -1*(center.x - (p0.x+p1.x)/2)/p0Slope + (p0.y+p1.y)/2
+    r = center.sub p0
     r = r.norm()
 
     return new Circle(center, r)
+
+  center: ->
+    new Point(sum(v.x for v in @vertexs)/3,sum(v.y for v in @vertexs)/3)
 
   contains: (point)  ->
     [p0, p1, p2] = @vertexs
@@ -45,7 +49,7 @@ class Triangle
 
     return (u >= 0) && (v >= 0) && (u + v < 1)
 
-  draw: (ctx) ->
+  draw: (ctx, hl = false) ->
     [p0, p1, p2] = @vertexs
     ctx.beginPath()
     ctx.moveTo(p0.x, p0.y)
