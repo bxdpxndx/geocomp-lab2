@@ -14,14 +14,22 @@ class Delaunay
     tri = (t for t in @triangles when t.contains(point))
     tri = tri[0]
     @retriangulate(tri, point)
+<<<<<<< HEAD
     while @needs_checking.length > 1
       t0 = @needs_checking.pop()
       t1 = @needs_checking.slice(-1)
       @flip_triangles(t0, t1[0])
+=======
+    while @needs_checking.length
+      [t0, t1] = @needs_checking.pop()
+      if t0.nbs.some((x) -> x == null) or t1.nbs.some((x) -> x == null)
+        continue
+      else
+        @flip_triangles(t0, t1)
+>>>>>>> 67e850c4bc3e440447f74036f2ce5bd3b734dbac
 
+    return
 
-    console.log @triangles.length
-    
   retriangulate: (tri, point) ->
     [p0,p1,p2] = tri.vertexs
     t0 = new Triangle(p0, p1, point)
@@ -33,13 +41,23 @@ class Delaunay
     t1.nbs = [t0, tri.nbs[1], t2]
     t2.nbs = [t0, t1, tri.nbs[2]]
 
+     # TODO: relink old triangles.
+     # code here...
+
     # i'm not sure this is 100% correct... don't know how to test.
     
     @triangles.push x for x in [t0,t1,t2]
+
+    #remove the old triangle
     @triangles.splice(@triangles.indexOf(tri),1)
-    @needs_checking.push x for x in [t0,t1,t2]
+
+    #recheck new triangles
+    @needs_checking.push [t0, t1]
+    @needs_checking.push [t1, t2]
+    @needs_checking.push [t2, t0]
 
   flip_triangles: (t1, t2) ->
+
     # two triangles and 4 points. find the points unique to each triangle
     # check if any point is inside the other triangles' circle.
     # if so, then flip the triangles and do the triangle dance.
@@ -77,6 +95,13 @@ class Delaunay
 
   draw: (ctx) ->
     p.draw(ctx) for p in @points
-    t.draw(ctx) for t in @triangles
-    t.getCircle().draw(ctx) for t in @triangles when @show_circles
+    for t in @triangles
+      t.draw(ctx)
+      t.getCircle().draw(ctx) if @show_circles
+    for [t0, t1] in @needs_checking
+      ctx.beginPath()
+      ctx.moveTo(t0.center().x, t0.center().y)
+      ctx.lineTo(t1.center().x, t1.center().y)
+      ctx.stroke()
+      return
     return
