@@ -120,7 +120,7 @@
     };
 
     Delaunay.prototype.flip_triangles = function(t1, t2) {
-      var all_t, c1, free_t1, free_t2, n, n_t1, n_t2, nbs_t1, nbs_t2, t, union_t1, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _ref, _ref1, _ref2, _ref3, _ref4, _results;
+      var all_t, c1, c2, free_t1, free_t2, n, n_t1, n_t2, nbs_t1, nbs_t2, t, union_t1, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _ref, _ref1, _ref2, _ref3, _ref4, _results;
       _ref = t1.vertexs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         t = _ref[_i];
@@ -135,8 +135,8 @@
           free_t2 = t;
         }
       }
-      console.log(t1);
       c1 = t1.getCircle();
+      c2 = t2.getCircle();
       if (c1.contains(free_t2) || c2.contains(free_t1)) {
         n_t1 = new Triangle(free_t1, free_t2, union[0]);
         n_t2 = new Triangle(free_t1, free_t2, union[1]);
@@ -277,7 +277,7 @@
       p1Slope = yDelta_p1 / xDelta_p1;
       center.x = (p0Slope * p1Slope * (p0.y - p2.y) + p1Slope * (p0.x + p1.x) - p0Slope * (p1.x + p2.x)) / (2 * (p1Slope - p0Slope));
       center.y = -1 * (center.x - (p0.x + p1.x) / 2) / p0Slope + (p0.y + p1.y) / 2;
-      r = center.sub(this.p0);
+      r = center.sub(p0);
       r = r.norm();
       return new Circle(center, r);
     };

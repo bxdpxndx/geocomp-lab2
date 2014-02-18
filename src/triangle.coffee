@@ -9,7 +9,6 @@ class Triangle
   getCircle: ->
     center = new Point(0,0);
     [p0, p1, p2] = @vertexs
-    console.log p0, p1, p2
     yDelta_p0 = p1.y - p0.y;
     xDelta_p0 = p1.x - p0.x;
     yDelta_p1 = p2.y - p1.y;
@@ -23,7 +22,7 @@ class Triangle
     p1Slope  = yDelta_p1/xDelta_p1;  
     center.x = (p0Slope*p1Slope*(p0.y - p2.y) + p1Slope*(p0.x + p1.x) - p0Slope*(p1.x+p2.x) )/(2*(p1Slope-p0Slope) );
     center.y = -1*(center.x - (p0.x+p1.x)/2)/p0Slope + (p0.y+p1.y)/2;
-    r = center.sub @p0
+    r = center.sub p0
     r = r.norm()
 
     return new Circle(center, r)

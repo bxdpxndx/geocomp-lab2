@@ -45,9 +45,8 @@ class Delaunay
     # if so, then flip the triangles and do the triangle dance.
     free_t1 = t for t in t1.vertexs when t not in t2.vertexs
     free_t2 = t for t in t2.vertexs when t not in t1.vertexs
-    console.log t1
     c1 = t1.getCircle()
-    #c2 = t2.getCircle()
+    c2 = t2.getCircle()
 
     if c1.contains(free_t2) or c2.contains(free_t1)
       # Create the news triangles 
