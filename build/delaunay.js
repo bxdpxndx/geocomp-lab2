@@ -14,7 +14,7 @@
     }
 
     Circle.prototype.contains = function(point) {
-      return this.r * this.r > (this.c.x - point.x) * (this.c.x - point.x) + (this.c.y - point.y) * (this.c.y - point.y);
+      return this.r * this.r < (this.c.x - point.x) * (this.c.x - point.x) + (this.c.y - point.y) * (this.c.y - point.y);
     };
 
     Circle.prototype.draw = function(ctx) {
@@ -87,10 +87,10 @@
       }).call(this);
       tri = tri[0];
       this.retriangulate(tri, point);
-      while (this.needs_checking.length) {
+      while (this.needs_checking.length > 1) {
         t0 = this.needs_checking.pop();
-        t1 = this.needs_checking.pop();
-        this.flip_triangles(t0, t1);
+        t1 = this.needs_checking.slice(-1);
+        this.flip_triangles(t0, t1[0]);
       }
       return console.log(this.triangles.length);
     };
@@ -120,7 +120,7 @@
     };
 
     Delaunay.prototype.flip_triangles = function(t1, t2) {
-      var all_t, c1, c2, free_t1, free_t2, n, n_t1, n_t2, nbs_t1, nbs_t2, t, union_t1, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n, _ref, _ref1, _ref2, _ref3, _ref4, _results;
+      var all_t, c1, c2, free_t1, free_t2, n, n_t1, n_t2, nbs_t1, nbs_t2, t, union, union_t1, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _m, _n, _o, _p, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _results;
       _ref = t1.vertexs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         t = _ref[_i];
@@ -135,32 +135,48 @@
           free_t2 = t;
         }
       }
+      _ref2 = t1.vertexs;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        t = _ref2[_k];
+        if (__indexOf.call(t2.vertexs, t) >= 0) {
+          union = t;
+        }
+      }
       c1 = t1.getCircle();
       c2 = t2.getCircle();
+      console.log(c1.contains(free_t2), c2.contains(free_t1));
       if (c1.contains(free_t2) || c2.contains(free_t1)) {
         n_t1 = new Triangle(free_t1, free_t2, union[0]);
         n_t2 = new Triangle(free_t1, free_t2, union[1]);
-        _ref2 = t1.nbs;
-        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-          t = _ref2[_k];
-          if (t === !t2) {
+        _ref3 = t1.nbs;
+        for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+          t = _ref3[_l];
+          if (__indexOf.call(t2, t) < 0) {
             nbs_t1 = t;
           }
         }
-        _ref3 = t2.nbs;
-        for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
-          t = _ref3[_l];
-          if (t === !t1) {
+        _ref4 = t2.nbs;
+        for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
+          t = _ref4[_m];
+          if (__indexOf.call(t1, t) < 0) {
             nbs_t2 = t;
           }
         }
         all_t = [nbs_t1, nbs_t2];
+        console.log(t1.nbs);
+        _ref5 = t1.nbs(-1);
+        for (_n = 0, _len5 = _ref5.length; _n < _len5; _n++) {
+          t = _ref5[_n];
+          console.log(t.vertexs[0], t.vertexs[1], t.vertexs[2]);
+        }
+        console.log;
+        console.log(t1.vertexs[0], t1.vertexs[1], t1.vertexs[2]);
         _results = [];
-        for (_m = 0, _len4 = all_t.length; _m < _len4; _m++) {
-          t = all_t[_m];
-          _ref4 = n_t1.vertexs;
-          for (_n = 0, _len5 = _ref4.length; _n < _len5; _n++) {
-            v = _ref4[_n];
+        for (_o = 0, _len6 = all_t.length; _o < _len6; _o++) {
+          t = all_t[_o];
+          _ref6 = n_t1.vertexs;
+          for (_p = 0, _len7 = _ref6.length; _p < _len7; _p++) {
+            v = _ref6[_p];
             if (__indexOf.call(t.vertexs, v) >= 0) {
               union_t1 = v;
             }
@@ -168,11 +184,11 @@
           if (union_t1.length > 1) {
             n_t1.nbs.push(t);
             _results.push((function() {
-              var _len6, _o, _ref5, _results1;
-              _ref5 = this.triangles;
+              var _len8, _q, _ref7, _results1;
+              _ref7 = this.triangles;
               _results1 = [];
-              for (_o = 0, _len6 = _ref5.length; _o < _len6; _o++) {
-                n = _ref5[_o];
+              for (_q = 0, _len8 = _ref7.length; _q < _len8; _q++) {
+                n = _ref7[_q];
                 if (n === t) {
                   _results1.push(n = t);
                 }
@@ -268,7 +284,6 @@
       var center, p0, p0Slope, p1, p1Slope, p2, r, xDelta_p0, xDelta_p1, yDelta_p0, yDelta_p1, _ref;
       center = new Point(0, 0);
       _ref = this.vertexs, p0 = _ref[0], p1 = _ref[1], p2 = _ref[2];
-      console.log(p0, p1, p2);
       yDelta_p0 = p1.y - p0.y;
       xDelta_p0 = p1.x - p0.x;
       yDelta_p1 = p2.y - p1.y;

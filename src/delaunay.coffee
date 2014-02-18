@@ -14,10 +14,10 @@ class Delaunay
     tri = (t for t in @triangles when t.contains(point))
     tri = tri[0]
     @retriangulate(tri, point)
-    while @needs_checking.length
+    while @needs_checking.length > 1
       t0 = @needs_checking.pop()
-      t1 = @needs_checking.pop()
-      @flip_triangles(t0, t1)
+      t1 = @needs_checking.slice(-1)
+      @flip_triangles(t0, t1[0])
 
 
     console.log @triangles.length
@@ -43,21 +43,27 @@ class Delaunay
     # two triangles and 4 points. find the points unique to each triangle
     # check if any point is inside the other triangles' circle.
     # if so, then flip the triangles and do the triangle dance.
+    
     free_t1 = t for t in t1.vertexs when t not in t2.vertexs
     free_t2 = t for t in t2.vertexs when t not in t1.vertexs
+    union   = t for t in t1.vertexs when t in t2.vertexs
     c1 = t1.getCircle()
     c2 = t2.getCircle()
-
+    console.log c1.contains(free_t2), c2.contains(free_t1)
     if c1.contains(free_t2) or c2.contains(free_t1)
       # Create the news triangles 
       n_t1 = new Triangle(free_t1, free_t2, union[0])
       n_t2 = new Triangle(free_t1, free_t2, union[1])
 
       # get the nbs of the olds triangles 
-      nbs_t1 = t for t in t1.nbs when t is not t2
-      nbs_t2 = t for t in t2.nbs when t is not t1
+      nbs_t1 = t for t in t1.nbs when t not in t2
+      nbs_t2 = t for t in t2.nbs when t not in t1
       all_t = [nbs_t1, nbs_t2]
-
+      console.log t1.nbs
+      for t in t1.nbs -1
+        console.log t.vertexs[0],t.vertexs[1],t.vertexs[2]
+      console.log 
+      console.log t1.vertexs[0],t1.vertexs[1],t1.vertexs[2]
       for t in all_t
         union_t1 = v for v in n_t1.vertexs when v in t.vertexs   
         #if union_t1.length > 1 then n_t1.nbs.push t else n_t2.nbs. push t 
