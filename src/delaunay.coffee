@@ -102,17 +102,7 @@ class Delaunay
         console.log t.vertexs, n_t1.vertexs, n_t2.vertexs
         console.log 'Values', free_p1.length, free_p2.length
 
-      #
-#      for t in nbs_t
-#        union_t1 = v for v in n_t1.vertexs when v in t.vertexs   
-#        #if union_t1.length > 1 then n_t1.nbs.push t else n_t2.nbs. push t 
-#        if union_t1.length > 1 
-#          n_t1.nbs.push t 
-#          for n in @triangles when n is t
-#            n = t
-#          # for t.nbs in n is t1  
-#        else 
-#          n_t2.nbs.push t 
+
 
   draw: (ctx) ->
     p.draw(ctx) for p in @points
