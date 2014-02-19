@@ -54,27 +54,54 @@ class Delaunay
     # two triangles and 4 points. find the points unique to each triangle
     # check if any point is inside the other triangles' circle.
     # if so, then flip the triangles and do the triangle dance.
-    
-    free_t1 = t for t in t1.vertexs when t not in t2.vertexs
-    free_t2 = t for t in t2.vertexs when t not in t1.vertexs
-    union   = t for t in t1.vertexs when t in t2.vertexs
+    union = []
+    free_t1 = []
+    free_t2 = []
+    free_t1.push t for t in t1.vertexs when t not in t2.vertexs
+    free_t2.push t for t in t2.vertexs when t not in t1.vertexs
+    union.push t for t in t1.vertexs when t in t2.vertexs
     c1 = t1.getCircle()
     c2 = t2.getCircle()
-    console.log c1.contains(free_t2), c2.contains(free_t1)
-    if c1.contains(free_t2) or c2.contains(free_t1)
+
+    console.log c1.contains(free_t2[0]), c2.contains(free_t1[0])
+    if c1.contains(free_t2[0]) or c2.contains(free_t1[0])
       # Create the news triangles 
       n_t1 = new Triangle(free_t1, free_t2, union[0])
       n_t2 = new Triangle(free_t1, free_t2, union[1])
 
+      nbs_t  = []
+
       # get the nbs of the olds triangles 
-      nbs_t1 = t for t in t1.nbs when t not in t2
-      nbs_t2 = t for t in t2.nbs when t not in t1
-      all_t = [nbs_t1, nbs_t2]
-      console.log t1.nbs
-      for t in t1.nbs -1
-        console.log t.vertexs[0],t.vertexs[1],t.vertexs[2]
-      console.log 
-      console.log t1.vertexs[0],t1.vertexs[1],t1.vertexs[2]
+      for t in t1.nbs
+        free_p = []
+        free_p.push p for p in t.vertexs when p not in t2.vertexs
+        if free_p.length 
+          nbs_t.push t
+
+      for t in t2.nbs
+        free_p = []
+        free_p.push p for p in t.vertexs when p not in t1.vertexs
+        if free_p.length 
+          nbs_t.push t
+
+      console.log t1.nbs, t2.nbs, nbs_t
+
+      #console.log 'This is the t1 nbs'
+      #for t in nbs_t1
+      #  console.log t.vertexs[0],t.vertexs[1],t.vertexs[2]
+      #console.log 'And t1 is'
+      #console.log t1.vertexs[0],t1.vertexs[1],t1.vertexs[2]
+      #console.log 'And t2 is'
+      #console.log t2.vertexs[0],t2.vertexs[1],t2.vertexs[2]
+      #console.log 'And it must be the same as this'
+      #console.log nbs_t1c.vertexs[0],nbs_t1c.vertexs[1],nbs_t1c.vertexs[2]
+
+      #console.log 'This is the t2 nbs'
+      #for t in nbs_t2
+      #  console.log t.vertexs[0],t.vertexs[1],t.vertexs[2]
+      #console.log 'And it must be the same as this'
+      #console.log nbs_t2c.vertexs[0],nbs_t2c.vertexs[1],nbs_t2c.vertexs[2]
+
       for t in all_t
         union_t1 = v for v in n_t1.vertexs when v in t.vertexs   
         #if union_t1.length > 1 then n_t1.nbs.push t else n_t2.nbs. push t 

@@ -17,10 +17,7 @@
       return this.r * this.r < (this.c.x - point.x) * (this.c.x - point.x) + (this.c.y - point.y) * (this.c.y - point.y);
     };
 
-    Circle.prototype.draw = function(ctx, hl) {
-      if (hl == null) {
-        hl = false;
-      }
+    Circle.prototype.draw = function(ctx) {
       ctx.beginPath();
       ctx.arc(this.c.x, this.c.y, this.r, 0, 2 * Math.PI);
       ctx.strokeStyle = this.color.asHex();
@@ -125,63 +122,75 @@
     };
 
     Delaunay.prototype.flip_triangles = function(t1, t2) {
-      var all_t, c1, c2, free_t1, free_t2, n, n_t1, n_t2, nbs_t1, nbs_t2, t, union, union_t1, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _m, _n, _o, _p, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _results;
+      var c1, c2, free_p, free_t1, free_t2, n, n_t1, n_t2, nbs_t, p, t, union, union_t1, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _m, _n, _o, _p, _q, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _results;
+      union = [];
+      free_t1 = [];
+      free_t2 = [];
       _ref = t1.vertexs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         t = _ref[_i];
         if (__indexOf.call(t2.vertexs, t) < 0) {
-          free_t1 = t;
+          free_t1.push(t);
         }
       }
       _ref1 = t2.vertexs;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         t = _ref1[_j];
         if (__indexOf.call(t1.vertexs, t) < 0) {
-          free_t2 = t;
+          free_t2.push(t);
         }
       }
       _ref2 = t1.vertexs;
       for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
         t = _ref2[_k];
         if (__indexOf.call(t2.vertexs, t) >= 0) {
-          union = t;
+          union.push(t);
         }
       }
       c1 = t1.getCircle();
       c2 = t2.getCircle();
-      console.log(c1.contains(free_t2), c2.contains(free_t1));
-      if (c1.contains(free_t2) || c2.contains(free_t1)) {
+      console.log(c1.contains(free_t2[0]), c2.contains(free_t1[0]));
+      if (c1.contains(free_t2[0]) || c2.contains(free_t1[0])) {
         n_t1 = new Triangle(free_t1, free_t2, union[0]);
         n_t2 = new Triangle(free_t1, free_t2, union[1]);
+        nbs_t = [];
         _ref3 = t1.nbs;
         for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
           t = _ref3[_l];
-          if (__indexOf.call(t2, t) < 0) {
-            nbs_t1 = t;
+          free_p = [];
+          _ref4 = t.vertexs;
+          for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
+            p = _ref4[_m];
+            if (__indexOf.call(t2.vertexs, p) < 0) {
+              free_p.push(p);
+            }
+          }
+          if (free_p.length) {
+            nbs_t.push(t);
           }
         }
-        _ref4 = t2.nbs;
-        for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
-          t = _ref4[_m];
-          if (__indexOf.call(t1, t) < 0) {
-            nbs_t2 = t;
-          }
-        }
-        all_t = [nbs_t1, nbs_t2];
-        console.log(t1.nbs);
-        _ref5 = t1.nbs(-1);
+        _ref5 = t2.nbs;
         for (_n = 0, _len5 = _ref5.length; _n < _len5; _n++) {
           t = _ref5[_n];
-          console.log(t.vertexs[0], t.vertexs[1], t.vertexs[2]);
+          free_p = [];
+          _ref6 = t.vertexs;
+          for (_o = 0, _len6 = _ref6.length; _o < _len6; _o++) {
+            p = _ref6[_o];
+            if (__indexOf.call(t1.vertexs, p) < 0) {
+              free_p.push(p);
+            }
+          }
+          if (free_p.length) {
+            nbs_t.push(t);
+          }
         }
-        console.log;
-        console.log(t1.vertexs[0], t1.vertexs[1], t1.vertexs[2]);
+        console.log(t1.nbs, t2.nbs, nbs_t);
         _results = [];
-        for (_o = 0, _len6 = all_t.length; _o < _len6; _o++) {
-          t = all_t[_o];
-          _ref6 = n_t1.vertexs;
-          for (_p = 0, _len7 = _ref6.length; _p < _len7; _p++) {
-            v = _ref6[_p];
+        for (_p = 0, _len7 = all_t.length; _p < _len7; _p++) {
+          t = all_t[_p];
+          _ref7 = n_t1.vertexs;
+          for (_q = 0, _len8 = _ref7.length; _q < _len8; _q++) {
+            v = _ref7[_q];
             if (__indexOf.call(t.vertexs, v) >= 0) {
               union_t1 = v;
             }
@@ -189,11 +198,11 @@
           if (union_t1.length > 1) {
             n_t1.nbs.push(t);
             _results.push((function() {
-              var _len8, _q, _ref7, _results1;
-              _ref7 = this.triangles;
+              var _len9, _r, _ref8, _results1;
+              _ref8 = this.triangles;
               _results1 = [];
-              for (_q = 0, _len8 = _ref7.length; _q < _len8; _q++) {
-                n = _ref7[_q];
+              for (_r = 0, _len9 = _ref8.length; _r < _len9; _r++) {
+                n = _ref8[_r];
                 if (n === t) {
                   _results1.push(n = t);
                 }
