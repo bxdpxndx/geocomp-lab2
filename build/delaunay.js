@@ -122,7 +122,7 @@
     };
 
     Delaunay.prototype.flip_triangles = function(t1, t2) {
-      var c1, c2, free_p, free_t1, free_t2, n, n_t1, n_t2, nbs_t, p, t, union, union_t1, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _m, _n, _o, _p, _q, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _results;
+      var c1, c2, free_p, free_p1, free_p2, free_t1, free_t2, n_t1, n_t2, nbs_t, nbs_t1, nbs_t2, p, t, union, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _results;
       union = [];
       free_t1 = [];
       free_t2 = [];
@@ -151,9 +151,11 @@
       c2 = t2.getCircle();
       console.log(c1.contains(free_t2[0]), c2.contains(free_t1[0]));
       if (c1.contains(free_t2[0]) || c2.contains(free_t1[0])) {
-        n_t1 = new Triangle(free_t1, free_t2, union[0]);
-        n_t2 = new Triangle(free_t1, free_t2, union[1]);
+        n_t1 = new Triangle(free_t1[0], free_t2[0], union[0]);
+        n_t2 = new Triangle(free_t1[0], free_t2[0], union[1]);
         nbs_t = [];
+        nbs_t1 = [];
+        nbs_t2 = [];
         _ref3 = t1.nbs;
         for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
           t = _ref3[_l];
@@ -167,6 +169,7 @@
           }
           if (free_p.length) {
             nbs_t.push(t);
+            nbs_t1.push(t);
           }
         }
         _ref5 = t2.nbs;
@@ -182,36 +185,30 @@
           }
           if (free_p.length) {
             nbs_t.push(t);
+            nbs_t2.push(t);
           }
         }
-        console.log(t1.nbs, t2.nbs, nbs_t);
         _results = [];
-        for (_p = 0, _len7 = all_t.length; _p < _len7; _p++) {
-          t = all_t[_p];
-          _ref7 = n_t1.vertexs;
+        for (_p = 0, _len7 = nbs_t.length; _p < _len7; _p++) {
+          t = nbs_t[_p];
+          free_p1 = [];
+          free_p2 = [];
+          _ref7 = t.vertexs;
           for (_q = 0, _len8 = _ref7.length; _q < _len8; _q++) {
-            v = _ref7[_q];
-            if (__indexOf.call(t.vertexs, v) >= 0) {
-              union_t1 = v;
+            p = _ref7[_q];
+            if (__indexOf.call(n_t1.vertexs, p) >= 0) {
+              free_p1.push(p);
             }
           }
-          if (union_t1.length > 1) {
-            n_t1.nbs.push(t);
-            _results.push((function() {
-              var _len9, _r, _ref8, _results1;
-              _ref8 = this.triangles;
-              _results1 = [];
-              for (_r = 0, _len9 = _ref8.length; _r < _len9; _r++) {
-                n = _ref8[_r];
-                if (n === t) {
-                  _results1.push(n = t);
-                }
-              }
-              return _results1;
-            }).call(this));
-          } else {
-            _results.push(n_t2.nbs.push(t));
+          _ref8 = t.vertexs;
+          for (_r = 0, _len9 = _ref8.length; _r < _len9; _r++) {
+            p = _ref8[_r];
+            if (__indexOf.call(n_t2.vertexs, p) >= 0) {
+              free_p2.push(p);
+            }
           }
+          console.log(t.vertexs, n_t1.vertexs, n_t2.vertexs);
+          _results.push(console.log('Values', free_p1.length, free_p2.length));
         }
         return _results;
       }

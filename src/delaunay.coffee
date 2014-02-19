@@ -66,52 +66,53 @@ class Delaunay
     console.log c1.contains(free_t2[0]), c2.contains(free_t1[0])
     if c1.contains(free_t2[0]) or c2.contains(free_t1[0])
       # Create the news triangles 
-      n_t1 = new Triangle(free_t1, free_t2, union[0])
-      n_t2 = new Triangle(free_t1, free_t2, union[1])
+      n_t1 = new Triangle(free_t1[0], free_t2[0], union[0])
+      n_t2 = new Triangle(free_t1[0], free_t2[0], union[1])
 
       nbs_t  = []
+      nbs_t1  = []
+      nbs_t2  = []
 
       # get the nbs of the olds triangles 
       for t in t1.nbs
         free_p = []
+        #console.log 't1 nbs'
         free_p.push p for p in t.vertexs when p not in t2.vertexs
         if free_p.length 
           nbs_t.push t
+          nbs_t1.push t
+          #console.log 'New triangle',t.vertexs, t2.vertexs
+        #else
+          #console.log 'Not new triagle', t.vertexs, t2.vertexs
 
       for t in t2.nbs
         free_p = []
         free_p.push p for p in t.vertexs when p not in t1.vertexs
         if free_p.length 
           nbs_t.push t
+          nbs_t2.push t
 
-      console.log t1.nbs, t2.nbs, nbs_t
+      # console.log t1.nbs, t2.nbs, nbs_t
+      #console.log n_t1, n_t2
+      for t in nbs_t
+        free_p1 = []
+        free_p2 = []
+        free_p1.push p for p in t.vertexs when p in n_t1.vertexs
+        free_p2.push p for p in t.vertexs when p in n_t2.vertexs 
+        console.log t.vertexs, n_t1.vertexs, n_t2.vertexs
+        console.log 'Values', free_p1.length, free_p2.length
 
-      #console.log 'This is the t1 nbs'
-      #for t in nbs_t1
-      #  console.log t.vertexs[0],t.vertexs[1],t.vertexs[2]
-      #console.log 'And t1 is'
-      #console.log t1.vertexs[0],t1.vertexs[1],t1.vertexs[2]
-      #console.log 'And t2 is'
-      #console.log t2.vertexs[0],t2.vertexs[1],t2.vertexs[2]
-      #console.log 'And it must be the same as this'
-      #console.log nbs_t1c.vertexs[0],nbs_t1c.vertexs[1],nbs_t1c.vertexs[2]
-
-      #console.log 'This is the t2 nbs'
-      #for t in nbs_t2
-      #  console.log t.vertexs[0],t.vertexs[1],t.vertexs[2]
-      #console.log 'And it must be the same as this'
-      #console.log nbs_t2c.vertexs[0],nbs_t2c.vertexs[1],nbs_t2c.vertexs[2]
-
-      for t in all_t
-        union_t1 = v for v in n_t1.vertexs when v in t.vertexs   
-        #if union_t1.length > 1 then n_t1.nbs.push t else n_t2.nbs. push t 
-        if union_t1.length > 1 
-          n_t1.nbs.push t 
-          for n in @triangles when n is t
-            n = t
-          # for t.nbs in n is t1  
-        else 
-          n_t2.nbs.push t 
+      #
+#      for t in nbs_t
+#        union_t1 = v for v in n_t1.vertexs when v in t.vertexs   
+#        #if union_t1.length > 1 then n_t1.nbs.push t else n_t2.nbs. push t 
+#        if union_t1.length > 1 
+#          n_t1.nbs.push t 
+#          for n in @triangles when n is t
+#            n = t
+#          # for t.nbs in n is t1  
+#        else 
+#          n_t2.nbs.push t 
 
   draw: (ctx) ->
     p.draw(ctx) for p in @points
