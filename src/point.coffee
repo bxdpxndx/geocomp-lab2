@@ -1,8 +1,8 @@
 class Point
 
   constructor: (x, y, color = black) ->
-    @x = x
-    @y = y
+    @x     = x
+    @y     = y
     @color = color
 
   add: (other) ->

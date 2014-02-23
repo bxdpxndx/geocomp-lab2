@@ -1,7 +1,7 @@
 class Circle
   constructor: (c, r, color=blue) ->
-    @c = c
-    @r = r
+    @c     = c
+    @r     = r
     @color = color
 
   contains: (point) ->

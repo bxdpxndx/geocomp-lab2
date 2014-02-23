@@ -3,10 +3,10 @@ class Delaunay
     @supertriangle = new Triangle(new Point(canvas.width/2,-1500),
                                   new Point(-1000, canvas.height + 1000),
                                   new Point(canvas.width+1000, canvas.height + 1000))
-    @triangles = [@supertriangle]
-    @points = @supertriangle.vertexs.slice()
+    @triangles      = [@supertriangle]
+    @points         = @supertriangle.vertexs.slice()
     @needs_checking = []
-    @show_circles = false
+    @show_circles   = false
 
   new_point: (point) ->
     @points.push(point)
@@ -54,7 +54,7 @@ class Delaunay
     # two triangles and 4 points. find the points unique to each triangle
     # check if any point is inside the other triangles' circle.
     # if so, then flip the triangles and do the triangle dance.
-    union = []
+    union   = []
     free_t1 = []
     free_t2 = []
     free_t1.push t for t in t1.vertexs when t not in t2.vertexs
@@ -70,8 +70,8 @@ class Delaunay
       n_t2 = new Triangle(free_t1[0], free_t2[0], union[1])
 
       nbs_t  = []
-      nbs_t1  = []
-      nbs_t2  = []
+      nbs_t1 = []
+      nbs_t2 = []
 
       # get the nbs of the olds triangles 
       for t in t1.nbs

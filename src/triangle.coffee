@@ -2,8 +2,8 @@ class Triangle
 
   constructor: (p0, p1, p2, color=green) ->
     @vertexs = [p0, p1, p2]
-    @nbs = [null,null,null]
-    @color = color
+    @nbs     = [null,null,null]
+    @color   = color
     
 
 
@@ -34,9 +34,9 @@ class Triangle
 
   contains: (point)  ->
     [p0, p1, p2] = @vertexs
-    v0 = p2.sub p0
-    v1 = p1.sub p0
-    v2 = point.sub p0
+    v0           = p2.sub p0
+    v1           = p1.sub p0
+    v2           = point.sub p0
 
     dot00 = v0.dot(v0)
     dot01 = v0.dot(v1)
