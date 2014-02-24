@@ -89,8 +89,12 @@ class Delaunay
     # two triangles and 4 points. find the points unique to each triangle
     # check if any point is inside the other triangles' circle.
     # if so, then flip the triangles and do the triangle dance.
-    free_t1 = t for t in t1.vertexs when t not in t2.vertexs
-    free_t2 = t for t in t2.vertexs when t not in t1.vertexs
+    union   = []
+    free_t1 = []
+    free_t2 = []
+    free_t1.push t for t in t1.vertexs when t not in t2.vertexs
+    free_t2.push t for t in t2.vertexs when t not in t1.vertexs
+    union.push t for t in t1.vertexs when t in t2.vertexs
     c1 = t1.getCircle()
     c2 = t2.getCircle()
 

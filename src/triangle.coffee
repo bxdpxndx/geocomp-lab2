@@ -30,6 +30,7 @@ class Triangle
     v1 = p1.sub p0
     v2 = point.sub p0
 
+
     dot00 = v0.dot(v0)
     dot01 = v0.dot(v1)
     dot02 = v0.dot(v2)

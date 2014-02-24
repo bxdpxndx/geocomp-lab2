@@ -1,10 +1,10 @@
 window.onload = ->
   
   # Can't touch this
-  fps = 10
+  fps    = 10
   canvas = document.getElementById('delaunay')
-  ctx = canvas.getContext('2d')
-  mouse = new Point(0,0)
+  ctx    = canvas.getContext('2d')
+  mouse  = new Point(0,0)
   ctx.translate(0.5, 0.5)
   window.setInterval(mainloop, 1000/ fps)
 
@@ -15,12 +15,12 @@ window.onload = ->
   # best practices... All browsers are broken
   
   window.onkeypress = (e) ->
-    key = String.fromCharCode e.which
+    key    = String.fromCharCode e.which
     action = keymap[key]
     action() if action isnt undefined
 
   newButton = (key, text, action) -> 
-    b = document.createElement("input")
+    b           = document.createElement("input")
     b.type      = "submit"
     b.className = "btn"
     b.value     = text + ' (' + key + ')'
