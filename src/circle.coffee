@@ -4,7 +4,7 @@ class Circle
 
 
   contains: (point) ->
-  	@r*@r < (@c.x - point.x)*(@c.x - point.x) + (@c.y - point.y) * (@c.y - point.y)
+  	@r*@r > (@c.x - point.x)*(@c.x - point.x) + (@c.y - point.y) * (@c.y - point.y)
 
   draw: (ctx, hl = false) ->
 

@@ -15,8 +15,9 @@ class HalfEdge
     ctx.strokeStyle = @color.asHex()
     ctx.stroke()
 
-  assert_opposite: =>
+  assert_edge: =>
     if @opposite isnt null
       assert(this, @opposite.opposite == this, "opposite's opposite isn't me")
       assert(this, @next.origin == @opposite.origin, "next and opposite don't start at the same point")
       assert(this, @opposite.next.origin == @origin, "opposite's next doesn't start where i do")
+      assert(this, @face == @next.face, "next's face isn't my face")

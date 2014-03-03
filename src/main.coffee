@@ -4,6 +4,7 @@ window.onload = ->
   fps    = 10
   canvas = document.getElementById('delaunay')
   ctx    = canvas.getContext('2d')
+  window.ctx = ctx
   mouse  = new Point(0,0)
   ctx.translate(0.5, 0.5)
   window.assert = (object, cond, message) ->

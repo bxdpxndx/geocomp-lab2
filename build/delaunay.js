@@ -9,6 +9,7 @@
     fps = 10;
     canvas = document.getElementById('delaunay');
     ctx = canvas.getContext('2d');
+    window.ctx = ctx;
     mouse = new Point(0, 0);
     ctx.translate(0.5, 0.5);
     window.assert = function(object, cond, message) {
@@ -67,7 +68,7 @@
     }
 
     Circle.prototype.contains = function(point) {
-      return this.r * this.r < (this.c.x - point.x) * (this.c.x - point.x) + (this.c.y - point.y) * (this.c.y - point.y);
+      return this.r * this.r > (this.c.x - point.x) * (this.c.x - point.x) + (this.c.y - point.y) * (this.c.y - point.y);
     };
 
     Circle.prototype.draw = function(ctx, hl) {
@@ -124,7 +125,7 @@
       var i, inside, p, _i, _ref;
       this.show_circles = false;
       inside = new Triangle();
-      this.points = [new Point(canvas.width / 2, -1500), new Point(canvas.width + 1000, canvas.height + 1000), new Point(-1000, canvas.height + 1000)];
+      this.points = [new Point(canvas.width / 2, -1500), new Point(-1000, canvas.height + 1000), new Point(canvas.width + 1000, canvas.height + 1000)];
       this.faces = [inside];
       this.edges = (function() {
         var _i, _len, _ref, _results;
@@ -137,13 +138,15 @@
         return _results;
       }).call(this);
       inside.edge = this.edges[0];
+      this.needs_checking = [];
       for (i = _i = 0, _ref = this.points.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         this.edges[i].next = this.edges[(i + 1) % 3];
       }
     }
 
     Delaunay.prototype.new_point = function(point) {
-      var f, face;
+      var e, f, face, _i, _len, _ref;
+      point.draw(ctx);
       this.points.push(point);
       face = (function() {
         var _i, _len, _ref, _results;
@@ -159,6 +162,14 @@
       }).call(this);
       face = face[0];
       this.retriangulate(face, point);
+      _ref = this.edges;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        e.assert_edge();
+      }
+      while (this.needs_checking.length) {
+        this.flip_edge(this.needs_checking.pop());
+      }
     };
 
     Delaunay.prototype.retriangulate = function(face, point) {
@@ -186,6 +197,9 @@
         faces[i].edge = good_edges[i];
         edges[i].next = pending_edges[(i + 1) % 3];
         pending_edges[i].next = good_edges[(i + 2) % 3];
+        if (edges[i].opposite !== null) {
+          this.needs_checking.push(edges[i]);
+        }
       }
     };
 
@@ -267,8 +281,38 @@
       }
     };
 
+    Delaunay.prototype.flip_edge = function(edge) {
+      var new0, new1, oppo, p0, p1;
+      oppo = edge.opposite;
+      p0 = edge.next.next.origin;
+      p1 = oppo.next.next.origin;
+      if (!(edge.face.getCircle().contains(p1) || oppo.face.getCircle().contains(p0))) {
+        return;
+      }
+      new0 = new HalfEdge(p0);
+      new1 = new HalfEdge(p1);
+      new0.opposite = new1;
+      new1.opposite = new0;
+      new0.next = oppo.next.next;
+      new1.next = edge.next.next;
+      new0.next.next = edge.next;
+      new1.next.next = oppo.next;
+      new0.next.next.next = new0;
+      new1.next.next.next = new1;
+      edge.face.edge = new0;
+      oppo.face.edge = new1;
+      new0.face = edge.face;
+      new1.face = oppo.face;
+      new0.next.face = new0.face;
+      new1.next.face = new1.face;
+      new0.next.next.face = new0.face;
+      new1.next.next.face = new1.face;
+      this.edges[this.edges.indexOf(edge)] = new0;
+      this.edges[this.edges.indexOf(oppo)] = new1;
+    };
+
     Delaunay.prototype.draw = function(ctx) {
-      var e, p, _i, _j, _len, _len1, _ref, _ref1;
+      var e, p, t, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
       _ref = this.points;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
@@ -278,6 +322,13 @@
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         e = _ref1[_j];
         e.draw(ctx);
+      }
+      if (this.show_circles) {
+        _ref2 = this.faces;
+        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+          t = _ref2[_k];
+          t.getCircle().draw(ctx);
+        }
       }
     };
 
@@ -336,7 +387,7 @@
       this.opposite = opposite != null ? opposite : null;
       this.next = next != null ? next : null;
       this.color = color != null ? color : green;
-      this.assert_opposite = __bind(this.assert_opposite, this);
+      this.assert_edge = __bind(this.assert_edge, this);
 
       this.id = Math.random();
     }
@@ -349,11 +400,12 @@
       return ctx.stroke();
     };
 
-    HalfEdge.prototype.assert_opposite = function() {
+    HalfEdge.prototype.assert_edge = function() {
       if (this.opposite !== null) {
         assert(this, this.opposite.opposite === this, "opposite's opposite isn't me");
         assert(this, this.next.origin === this.opposite.origin, "next and opposite don't start at the same point");
-        return assert(this, this.opposite.next.origin === this.origin, "opposite's next doesn't start where i do");
+        assert(this, this.opposite.next.origin === this.origin, "opposite's next doesn't start where i do");
+        return assert(this, this.face === this.next.face, "next's face isn't my face");
       }
     };
 
