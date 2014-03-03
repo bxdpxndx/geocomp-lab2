@@ -5,84 +5,56 @@ class Delaunay
 
     # create supertriangle
     inside = new Triangle()
-    outside = new Triangle()
-    @points = [new Point(canvas.width/2,-1500)
-              new Point(canvas.width+1000, canvas.height + 1000)
-              new Point(-1000, canvas.height + 1000)
-              ]
-    @faces = [inside, outside]
-    @edges = []
-
-    #create one-way edges
-    for i in [0...@points.length]
-      @edges.push new HalfEdge(@points[i], inside)
-
-    #add the edges that go the other way
-    for i in [0...@points.length]
-      @edges.push new HalfEdge(@points[2-i], outside)
-
-    #finish the faces
-    @faces[0].edge = @edges[0]
-    @faces[1].edge = @edges[3]
+    @points = [new Point(canvas.width/2,-1500), new Point(canvas.width+1000, canvas.height + 1000), new Point(-1000, canvas.height + 1000)]
+    #@points = [new Point(canvas.width/2,canvas.height-10), new Point(canvas.width - 10, 10), new Point(10, 10)]
+    @faces = [inside]
+    @edges = (new HalfEdge(p, inside) for p in @points)
+    inside.edge = @edges[0]
 
     #link the edges
     for i in [0...@points.length]
       @edges[i].next = @edges[(i+1)%3]
-      @edges[i+3].next = @edges[(i+1)%3 + 3]
 
-    #hacky! this allows easy linking of opposite edges
-    [@edges[3],@edges[4]] = [@edges[4],@edges[3]]
-
-    #now link opposites
-    for i in [0...@points.length]
-      @edges[i].opposite = @edges[i+3]
-      @edges[i].opposite.opposite = @edges[i]
-
-    # madness? this is sparta!
-    # but it works, so deal with it
 
   new_point: (point) ->
-    # TODO: triangle dance
     @points.push(point)
 
-    tri = (t for t in @triangles when t.contains(point))
-    tri = tri[0]
-    @retriangulate(tri, point)
-    while @needs_checking.length
-      [t0, t1] = @needs_checking.pop()
-      if t0.nbs.some((x) -> x == null) or t1.nbs.some((x) -> x == null)
-        continue
-      else
-        @flip_triangles(t0, t1)
+    face = (f for f in @faces when f.contains(point))
+    face = face[0]
+    @retriangulate(face, point)
+
 
     return
 
   # reimplement this
-  retriangulate: (tri, point) ->
-    [p0,p1,p2] = tri.vertexs
-    t0 = new Triangle(p0, p1, point)
-    t1 = new Triangle(point, p1, p2)
-    t2 = new Triangle(p0, point, p2)
+  retriangulate: (face, point) ->
+    edges = face.edges()
+    points = face.points()
+    pending_edges = []
+    good_edges = []
+    faces = [face, new Triangle(), new Triangle()]
+    @faces.push faces[1]
+    @faces.push faces[2]
+    for i in [0...3]
+      e0 = new HalfEdge point, faces[i]
+      e1 = new HalfEdge points[i], faces[(i+2) % 3]
+      edges[i].face = faces[i]
+      e0.next = edges[i]
+      e0.opposite = e1
+      e1.opposite = e0
 
-    # triangles do a little happy dance
-    t0.nbs = [tri.nbs[0], t1, t2]
-    t1.nbs = [t0, tri.nbs[1], t2]
-    t2.nbs = [t0, t1, tri.nbs[2]]
+      @edges.push e0
+      @edges.push e1
+      pending_edges.push e1
+      good_edges.push e0
 
-     # TODO: relink old triangles.
-     # code here...
+    for i in [0...3]
+      faces[i].edge = good_edges[i]
+      edges[i].next = pending_edges[(i+1) % 3]
+      pending_edges[i].next = good_edges[(i+2) % 3]
 
-    # i'm not sure this is 100% correct... don't know how to test.
+    return
 
-    @triangles.push x for x in [t0,t1,t2]
-
-    #remove the old triangle
-    @triangles.splice(@triangles.indexOf(tri),1)
-
-    #recheck new triangles
-    @needs_checking.push [t0, t1]
-    @needs_checking.push [t1, t2]
-    @needs_checking.push [t2, t0]
 
   flip_triangles: (t1, t2) ->
 
@@ -121,13 +93,6 @@ class Delaunay
 
   draw: (ctx) ->
     p.draw(ctx) for p in @points
-    for t in @triangles
-      t.draw(ctx)
-      t.getCircle().draw(ctx) if @show_circles
-    for [t0, t1] in @needs_checking
-      ctx.beginPath()
-      ctx.moveTo(t0.center().x, t0.center().y)
-      ctx.lineTo(t1.center().x, t1.center().y)
-      ctx.stroke()
-      return
+    for e in @edges
+      e.draw(ctx)
     return

@@ -1,10 +1,15 @@
 class Triangle
 
-  constructor: (@edge) ->
+  constructor: (@edge = null) ->
+
+
+  edges: -> [@edge, @edge.next, @edge.next.next]
+
+  points: -> (e.origin for e in @edges())
 
   getCircle: ->
     center = new Point(0,0)
-    [p0, p1, p2] = [@edge.origin, @edge.next.origin, @edge.next.next.origin]
+    [p0, p1, p2] = @points()
     yDelta_p0 = p1.y - p0.y
     xDelta_p0 = p1.x - p0.x
     yDelta_p1 = p2.y - p1.y
@@ -24,12 +29,11 @@ class Triangle
 
     return new Circle(center, r)
 
-  contains: (point)  ->
-    [p0, p1, p2] = [@edge.origin, @edge.next.origin, @edge.next.next.origin]
+  contains: (point) ->
+    [p0, p1, p2] = @points()
     v0 = p2.sub p0
     v1 = p1.sub p0
     v2 = point.sub p0
-
 
     dot00 = v0.dot(v0)
     dot01 = v0.dot(v1)
@@ -43,14 +47,4 @@ class Triangle
 
     return (u >= 0) && (v >= 0) && (u + v < 1)
 
-  #FIXME: maybe we won't need this
-  draw: (ctx, hl = false) ->
-    [p0, p1, p2] = @vertexs
-    ctx.beginPath()
-    ctx.moveTo(p0.x, p0.y)
-    ctx.lineTo(p1.x, p1.y)
-    ctx.lineTo(p2.x, p2.y)
-    ctx.lineTo(p0.x, p0.y)
-    ctx.strokeStyle = @color.asHex()
-    ctx.stroke()
 

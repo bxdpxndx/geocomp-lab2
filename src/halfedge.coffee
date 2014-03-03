@@ -5,8 +5,18 @@ class HalfEdge
   # opposite: Edge representing the other direction
   # next: next Edge of this face
 
-  constructor: (@origin, @face, @opposite = null, @next = null) ->
+  constructor: (@origin, @face, @opposite = null, @next = null, @color = green) ->
     @id = Math.random()
 
-  toString: ->
-    "edge #{@id} from #{@origin.x},#{@origin.y} to #{@next.origin.x},#{@next.origin.y}"
+  draw: (ctx) ->
+    ctx.beginPath()
+    ctx.moveTo(@origin.x, @origin.y)
+    ctx.lineTo(@next.origin.x, @next.origin.y)
+    ctx.strokeStyle = @color.asHex()
+    ctx.stroke()
+
+  assert_opposite: =>
+    if @opposite isnt null
+      assert(this, @opposite.opposite == this, "opposite's opposite isn't me")
+      assert(this, @next.origin == @opposite.origin, "next and opposite don't start at the same point")
+      assert(this, @opposite.next.origin == @origin, "opposite's next doesn't start where i do")

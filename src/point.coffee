@@ -8,14 +8,14 @@ class Point
   add: (other) ->
     return new Point(@x + other.x, @y + other.y)
 
-  sub: (other) -> 
+  sub: (other) ->
     return new Point(@x - other.x, @y - other.y)
 
-  dot: (other) -> 
+  dot: (other) ->
     return @x * other.x + @y * other.y
 
   norm: ->
-    return Math.sqrt(@x*@x + @y*@y) 
+    return Math.sqrt(@x*@x + @y*@y)
 
   draw: (ctx) ->
     sz = 2
@@ -26,4 +26,4 @@ class Point
     ctx.lineTo(@x-sz, @y+sz)
     ctx.strokeStyle = @color.asHex()
     ctx.stroke()
-  
+
