@@ -2,7 +2,7 @@ window.onload = ->
 
   # Can't touch this
   fps    = 10
-  canvas = document.getElementById('delaunay')
+  canvas = document.getElementById("delaunay")
   ctx    = canvas.getContext('2d')
   window.ctx = ctx
   mouse  = new Point(0,0)
@@ -46,17 +46,25 @@ window.onload = ->
     delaunay.draw(ctx)
   # handlers and thingies that can't be initialized earlier.
 
-  canvas.onclick = (e) ->
-    delaunay.new_point(new Point(e.offsetX, e.offsetY))
+  canvas.addEventListener "mouseup", (e) -> delaunay.new_point(new Point(e.offsetX, e.offsetY))
 
-  canvas.onmousemove = (e) ->
-    mouse = new Point(e.offsetX, e.offsetY)
+  canvas.addEventListener "mousemove", (e) -> mouse = new Point(e.offsetX, e.offsetY)
 
   # define new behaviours here.
   window.setInterval(mainloop, 1000/ fps)
 
   newButton('r', 'Clear', -> delaunay = new Delaunay(canvas))
   newButton('q', 'Toggle Circles', -> delaunay.show_circles = !delaunay.show_circles)
+  newButton('w', 'Add random point', -> delaunay.new_point(new Point(Math.random()*canvas.width, Math.random()*canvas.height)))
+  newButton('e', 'Add 50 points', -> delaunay.new_point(new Point(Math.random()*canvas.width, Math.random()*canvas.height)) for i in [0...50])
+  newButton('a', 'Preset: Grid', ->
+    delaunay = new Delaunay(canvas)
+    for i in [15..canvas.width-15] by 90
+      for j in [15..canvas.height-15] by 90
+        delaunay.new_point(new Point(i,j))
+  )  # ...
+
+
 
 # REQUIREMENTS
 

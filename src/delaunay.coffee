@@ -17,7 +17,6 @@ class Delaunay
     for i in [0...@points.length]
       @edges[i].next = @edges[(i+1)%3]
 
-
   new_point: (point) ->
     point.draw(ctx)
     @points.push(point)
@@ -56,44 +55,7 @@ class Delaunay
       edges[i].next = pending_edges[(i+1) % 3]
       pending_edges[i].next = good_edges[(i+2) % 3]
       @needs_checking. push edges[i] if edges[i].opposite isnt null
-
     return
-
-
-  flip_triangles: (t1, t2) ->
-
-    # two triangles and 4 points. find the points unique to each triangle
-    # check if any point is inside the other triangles' circle.
-    # if so, then flip the triangles and do the triangle dance.
-    union   = []
-    free_t1 = []
-    free_t2 = []
-    free_t1.push t for t in t1.vertexs when t not in t2.vertexs
-    free_t2.push t for t in t2.vertexs when t not in t1.vertexs
-    union.push t for t in t1.vertexs when t in t2.vertexs
-    c1 = t1.getCircle()
-    c2 = t2.getCircle()
-
-    if c1.contains(free_t2) or c2.contains(free_t1)
-      # Create the news triangles
-      n_t1 = new Triangle(free_t1, free_t2, union[0])
-      n_t2 = new Triangle(free_t1, free_t2, union[1])
-
-      # get the nbs of the olds triangles
-      nbs_t1 = t for t in t1.nbs when t is not t2
-      nbs_t2 = t for t in t2.nbs when t is not t1
-      all_t = [nbs_t1, nbs_t2]
-
-      for t in all_t
-        union_t1 = v for v in n_t1.vertexs when v in t.vertexs
-        #if union_t1.length > 1 then n_t1.nbs.push t else n_t2.nbs. push t
-        if union_t1.length > 1
-          n_t1.nbs.push t
-          for n in @triangles when n is t
-            n = t
-          # for t.nbs in n is t1
-        else
-          n_t2.nbs.push t
 
   flip_edge: (edge) ->
     oppo = edge.opposite
@@ -126,8 +88,7 @@ class Delaunay
     return
 
   draw: (ctx) ->
+    t.getCircle().draw(ctx) for t in @faces if @show_circles
+    e.draw(ctx) for e in @edges
     p.draw(ctx) for p in @points
-    for e in @edges
-      e.draw(ctx)
-    if @show_circles then t.getCircle().draw(ctx) for t in @faces
     return
