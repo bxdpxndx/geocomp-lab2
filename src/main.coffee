@@ -61,7 +61,7 @@ window.onload = ->
     delaunay = new Delaunay(canvas)
     for i in [15..canvas.width-15] by 90
       for j in [15..canvas.height-15] by 90
-        delaunay.new_point(new Point(i,j))
+        delaunay.new_point(new Point(i,j+i/90))
   )  # ...
 
 

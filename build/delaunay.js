@@ -76,7 +76,7 @@
           var _j, _ref1, _results1;
           _results1 = [];
           for (j = _j = 15, _ref1 = canvas.height - 15; _j <= _ref1; j = _j += 90) {
-            _results1.push(delaunay.new_point(new Point(i, j)));
+            _results1.push(delaunay.new_point(new Point(i, j + i / 90)));
           }
           return _results1;
         })());
